@@ -282,14 +282,14 @@ namespace Solvers {
      */
     void determineWetDryState() override {
       // Determine the wet/dry state
-      alignas(32) double hLeft4Arr[4];_mm256_storeu_pd(hLeft4Arr, hLeft);
-      alignas(32) double hRight4Arr[4];_mm256_storeu_pd(hRight4Arr, hRight);
-      alignas(32) double uRight4Arr[4];_mm256_storeu_pd(uRight4Arr, uRight);
-      alignas(32) double huRight4Arr[4];_mm256_storeu_pd(huRight4Arr, huRight);
-      alignas(32) double bLeft4Arr[4];_mm256_storeu_pd(bLeft4Arr, bLeft);
-      alignas(32) double bRight4Arr[4];_mm256_storeu_pd(bRight4Arr, bRight);
-      alignas(32) double huLeft4Arr[4];_mm256_storeu_pd(huLeft4Arr, huLeft);
-      alignas(32) double uLeft4Arr[4];_mm256_storeu_pd(uLeft4Arr, uLeft);
+      alignas(32) double hLeft4Arr[4];_mm256_storeu_pd(hLeft4Arr, hLeft_);
+      alignas(32) double hRight4Arr[4];_mm256_storeu_pd(hRight4Arr, hRight_);
+      alignas(32) double uRight4Arr[4];_mm256_storeu_pd(uRight4Arr, uRight_);
+      alignas(32) double huRight4Arr[4];_mm256_storeu_pd(huRight4Arr, huRight_);
+      alignas(32) double bLeft4Arr[4];_mm256_storeu_pd(bLeft4Arr, bLeft_);
+      alignas(32) double bRight4Arr[4];_mm256_storeu_pd(bRight4Arr, bRight_);
+      alignas(32) double huLeft4Arr[4];_mm256_storeu_pd(huLeft4Arr, huLeft_);
+      alignas(32) double uLeft4Arr[4];_mm256_storeu_pd(uLeft4Arr, uLeft_);
       for(int i=0;i<4;i++){
         if (hLeft4Arr[i] < dryTol_ && hRight4Arr[i] < dryTol_) { // Both cells are dry
           wetDryState_[i] = WavePropagationSolver<T>::WetDryState::DryDry;
@@ -320,14 +320,14 @@ namespace Solvers {
           wetDryState_[i] = WavePropagationSolver<T>::WetDryState::WetWet;
         }
       }
-      hLeft = _mm256_loadu_pd(hLeft4Arr);
-      hRight = _mm256_loadu_pd(hRight4Arr);
-      uRight = _mm256_loadu_pd(uRight4Arr);
-      huRight = _mm256_loadu_pd(huRight4Arr);
-      bLeft = _mm256_loadu_pd(bLeft4Arr);
-      bRight = _mm256_loadu_pd(bRight4Arr);
-      huLeft = _mm256_loadu_pd(huLeft4Arr);
-      uLeft = _mm256_loadu_pd(uLeft4Arr);
+      hLeft_ = _mm256_loadu_pd(hLeft4Arr);
+      hRight_ = _mm256_loadu_pd(hRight4Arr);
+      uRight_ = _mm256_loadu_pd(uRight4Arr);
+      huRight_ = _mm256_loadu_pd(huRight4Arr);
+      bLeft_ = _mm256_loadu_pd(bLeft4Arr);
+      bRight_ = _mm256_loadu_pd(bRight4Arr);
+      huLeft_ = _mm256_loadu_pd(huLeft4Arr);
+      uLeft_ = _mm256_loadu_pd(uLeft4Arr);
       
     }
 
