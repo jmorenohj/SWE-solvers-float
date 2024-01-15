@@ -1,3 +1,5 @@
+#include <immintrin.h>
+
 #pragma once
 
 namespace Solvers {
@@ -35,14 +37,14 @@ namespace Solvers {
 #define uRight_ (u_[1])
 #else
     //! Edge-local variables.
-    T hLeft_;   //! Height on the left side of the edge (could change during execution).
-    T hRight_;  //! Height on the right side of the edge (could change during execution).
-    T huLeft_;  //! Momentum on the left side of the edge (could change during execution).
-    T huRight_; //! Momentum on the right side of the edge (could change during execution).
-    T bLeft_;   //! Bathymetry on the left side of the edge (could change during execution).
-    T bRight_;  //! Bathymetry on the right side of the edge (could change during execution).
-    T uLeft_;   //! Velocity on the left side of the edge (computed by determineWetDryState).
-    T uRight_;  //! Velocity on the right side of the edge (computed by determineWetDryState).
+    __m256d hLeft_;   //! Height on the left side of the edge (could change during execution).
+    __m256d hRight_;  //! Height on the right side of the edge (could change during execution).
+    __m256d huLeft_;  //! Momentum on the left side of the edge (could change during execution).
+    __m256d huRight_; //! Momentum on the right side of the edge (could change during execution).
+    __m256d bLeft_;   //! Bathymetry on the left side of the edge (could change during execution).
+    __m256d bRight_;  //! Bathymetry on the right side of the edge (could change during execution).
+    __m256d uLeft_;   //! Velocity on the left side of the edge (computed by determineWetDryState).
+    __m256d uRight_;  //! Velocity on the right side of the edge (computed by determineWetDryState).
 #endif
 
     /**
@@ -63,7 +65,7 @@ namespace Solvers {
                               enough to overcome the difference. */
     };
 
-    WetDryState wetDryState_; //! wet/dry state of our Riemann-problem (determined by determineWetDryState).
+    WetDryState wetDryState_[4]; //! wet/dry state of our Riemann-problem (determined by determineWetDryState).
 
     //! Determine the wet/dry-state and set local values if we have to.
     virtual void determineWetDryState() = 0;
@@ -90,7 +92,7 @@ namespace Solvers {
      * @param bLeft bathymetry on the left side of the edge.
      * @param bRight bathymetry on the right side of the edge.
      */
-    void storeParameters(
+    void storeParameters(          ////////////////////////////////////////////////////////////////////////////////////
       const T& hLeft, const T& hRight, const T& huLeft, const T& huRight, const T& bLeft, const T& bRight
     ) {
       hLeft_  = hLeft;
@@ -116,14 +118,14 @@ namespace Solvers {
      * @param uRight velocity on the right side of the edge.
      */
     void storeParameters(
-      const T& hLeft,
-      const T& hRight,
-      const T& huLeft,
-      const T& huRight,
-      const T& bLeft,
-      const T& bRight,
-      const T& uLeft,
-      const T& uRight
+      const __m256d& hLeft,
+      const __m256d& hRight,
+      const __m256d& huLeft,
+      const __m256d& huRight,
+      const __m256d& bLeft,
+      const __m256d& bRight,
+      const __m256d& uLeft,
+      const __m256d& uRight
     ) {
       storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
 

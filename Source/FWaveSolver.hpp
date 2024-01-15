@@ -51,8 +51,10 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
-
+#include <immintrin.h>
 #include "WavePropagationSolver.hpp"
+
+
 
 namespace Solvers {
 
@@ -85,25 +87,33 @@ namespace Solvers {
      *
      * @param o_waveSpeeds will be set to: speeds of the linearized waves (eigenvalues).
      */
-    void computeWaveSpeeds(T o_waveSpeeds[2]) const {
+    void computeWaveSpeeds(__m256d o_waveSpeeds[2]) const {
       // Compute eigenvalues of the Jacobian matrices in states Q_{i-1} and Q_{i}
-      T characteristicSpeeds[2]{};
-      characteristicSpeeds[0] = uLeft_ - std::sqrt(gravity_ * hLeft_);
-      characteristicSpeeds[1] = uRight_ + std::sqrt(gravity_ * hRight_);
+      __m256d characteristicSpeeds[2]{};
+
+      characteristicSpeeds[0] = _mm256_sub_pd(uLeft_, _mm256_sqrt_pd(_mm256_mul_pd(_mm256_set1_pd(gravity_), hLeft_)));
+      characteristicSpeeds[1] = _mm256_add_pd(uRight_, _mm256_sqrt_pd(_mm256_mul_pd(_mm256_set1_pd(gravity_), hRight_)));
 
       // Compute "Roe speeds"
-      T hRoe = T(0.5) * (hRight_ + hLeft_);
-      T uRoe = uLeft_ * std::sqrt(hLeft_) + uRight_ * std::sqrt(hRight_);
-      uRoe /= std::sqrt(hLeft_) + std::sqrt(hRight_);
+      
+      __m256d hRoe = _mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_add_pd(hRight, hLeft));
 
-      T roeSpeeds[2]{};
-      roeSpeeds[0] = uRoe - std::sqrt(gravity_ * hRoe);
-      roeSpeeds[1] = uRoe + std::sqrt(gravity_ * hRoe);
+      __m256d sqrtHL = _mm256_sqrt_pd(hLeft);
+      __m256d sqrtHR = _mm256_sqrt_pd(hRight);
+
+      __m256d uRoe = _mm256_add_pd(_mm256_mul_pd(uLeft, sqrtHL), _mm256_mul_pd(uRight, sqrtHR));
+
+      uRoe = _mm256_div_pd(uRoe, _mm256_add_pd(sqrtHL, sqrtHR));
+
+      __m256d roeSpeeds[2]{};
+
+      roeSpeeds[0] = _mm256_sub_pd(uRoe, _mm256_sqrt_pd(_mm256_mul_pd(_mm256_set1_pd(gravity_), hRoe)));
+      roeSpeeds[1] = _mm256_add_pd(uRoe, _mm256_sqrt_pd(_mm256_mul_pd(_mm256_set1_pd(gravity_), hRoe)));
 
       // Compute eindfeldt speeds
-      T einfeldtSpeeds[2]{};
-      einfeldtSpeeds[0] = std::min(characteristicSpeeds[0], roeSpeeds[0]);
-      einfeldtSpeeds[1] = std::max(characteristicSpeeds[1], roeSpeeds[1]);
+      __m256d einfeldtSpeeds[2]{};
+      einfeldtSpeeds[0] = _mm256_min_pd(characteristicSpeeds[0], roeSpeeds[0]);
+      einfeldtSpeeds[1] = _mm256_max_pd(characteristicSpeeds[1], roeSpeeds[1]);
 
       // Set wave speeds
       o_waveSpeeds[0] = einfeldtSpeeds[0];
@@ -116,7 +126,7 @@ namespace Solvers {
      * @param waveSpeeds speeds of the linearized waves (eigenvalues).
      * @param o_fWaves will be set to: Decomposition into f-Waves.
      */
-    void computeWaveDecomposition(const T waveSpeeds[2], T o_fWaves[2][2]) const {
+    void computeWaveDecomposition(const __m256d waveSpeeds[2], __m256d o_fWaves[2][2]) const {
       // Eigenvalues***********************************************************************************************
       // Computed somewhere before.
       // An option would be to use the char. Speeds:
@@ -144,47 +154,47 @@ namespace Solvers {
       // **********************************************************************************************************
 
       // assert: wave speed of the 1st wave family should be less than the speed of the 2nd wave family.
-      assert(waveSpeeds[0] < waveSpeeds[1]);
+      //assert(waveSpeeds[0] < waveSpeeds[1]);
 
-      T lambdaDif = waveSpeeds[1] - waveSpeeds[0];
+      __m256d lambdaDif = _mm256_sub_pd(waveSpeeds[1], waveSpeeds[0]);
 
       // assert: no division by zero
-      assert(std::abs(lambdaDif) > zeroTol_);
+      //assert(std::abs(lambdaDif) > zeroTol_);
 
       // Compute the inverse matrix R^{-1}
-      T Rinv[2][2]{};
+      __m256d Rinv[2][2]{};
 
-      T oneDivLambdaDif = T(1.0) / lambdaDif;
-      Rinv[0][0]        = oneDivLambdaDif * waveSpeeds[1];
-      Rinv[0][1]        = -oneDivLambdaDif;
+      _m256d oneDivLambdaDif = _mm256_div_pd(_mm256_set1_pd(1.0), lambdaDif);
+      Rinv[0][0]        = _mm256_mul_pd(oneDivLambdaDif, waveSpeeds[1]);
+      Rinv[0][1]        = _mm256_mul_pd(_mm256_set1_pd(-1.0),oneDivLambdaDif);
 
-      Rinv[1][0] = oneDivLambdaDif * -waveSpeeds[0];
+      Rinv[1][0] = _mm256_mul_pd(oneDivLambdaDif, _mm256_mul_pd(_mm256_set1_pd(-1.0),waveSpeeds[0]));
       Rinv[1][1] = oneDivLambdaDif;
 
       // Right hand side
-      T fDif[2]{};
+      __m256d fDif[2]{};
 
-      // Calculate modified (bathymetry!) flux difference
+      // Calculate modified (bathymetry!) flux difference_mm256_set1_pd(0.5)
       // f(Q_i) - f(Q_{i-1})
-      fDif[0] = huRight_ - huLeft_;
-      fDif[1] = huRight_ * uRight_ + T(0.5) * gravity_ * hRight_ * hRight_
-                - (huLeft_ * uLeft_ + T(0.5) * gravity_ * hLeft_ * hLeft_);
+      fDif[0] = _mm256_sub_pd(huRight_, huLeft_);
+      fDif[1] = _mm256_sub_pd(_mm256_add_pd(_mm256_mul_pd(huRight_,uRight_), _mm256_mul_pd(_mm256_mul_pd(_mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_pd(gravity)), hRight_), hRight_))
+                , _mm256_add_pd(_mm256_mul_pd(huLeft_, uLeft_), _mm256_mul_pd(_mm256_mul_pd(_mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_pd(gravity_)), hLeft_), hLeft_)));
 
       // \delta x \Psi[2]
-      T psi = -gravity_ * T(0.5) * (hRight_ + hLeft_) * (bRight_ - bLeft_);
-      fDif[1] -= psi;
+      __m256d psi = _mm256_mul_pd(_mm256_mul_pd(_mm256_mul_pd(_mm256_set1_pd(-gravity_), _mm256_set1_pd(0.5)), _mm256_add_pd(hRight_, hLeft_)), _mm256_sub_pd(bRight_, bLeft_));
+      fDif[1] = _mm256_sub_pd(fDif[1],psi);
 
       // Solve linear equations
-      T beta[2]{};
-      beta[0] = Rinv[0][0] * fDif[0] + Rinv[0][1] * fDif[1];
-      beta[1] = Rinv[1][0] * fDif[0] + Rinv[1][1] * fDif[1];
+      __m256d beta[2]{};
+      beta[0] = _mm256_add_pd(_mm256_mul_pd(Rinv[0][0], fDif[0]), _mm256_mul_pd(Rinv[0][1], fDif[1]));
+      beta[1] = _mm256_add_pd(_mm256_mul_pd(Rinv[1][0], fDif[0]), _mm256_mul_pd(Rinv[1][1], fDif[1]));
 
       // Return f-waves
       o_fWaves[0][0] = beta[0];
-      o_fWaves[0][1] = beta[0] * waveSpeeds[0];
+      o_fWaves[0][1] = _mm256_mul_pd(beta[0], waveSpeeds[0]);
 
       o_fWaves[1][0] = beta[1];
-      o_fWaves[1][1] = beta[1] * waveSpeeds[1];
+      o_fWaves[1][1] = _mm256_mul_pd(beta[1], waveSpeeds[1]);
     }
 
     /**
@@ -200,53 +210,70 @@ namespace Solvers {
      * @param o_maxWaveSpeed will be set to: Maximum (linearized) wave speed -> Should be used in the CFL-condition.
      */
     void computeNetUpdatesWithWaveSpeeds(
-      const T waveSpeeds[2],
-      T&      o_hUpdateLeft,
-      T&      o_hUpdateRight,
-      T&      o_huUpdateLeft,
-      T&      o_huUpdateRight,
-      T&      o_maxWaveSpeed
+      const __m256d waveSpeeds[2],
+      __m256d&      o_hUpdateLeft,
+      __m256d&      o_hUpdateRight,
+      __m256d&      o_huUpdateLeft,
+      __m256d&      o_huUpdateRight,
+      __m256d&      o_maxWaveSpeed
     ) {
       // Reset net updates
-      o_hUpdateLeft = o_hUpdateRight = o_huUpdateLeft = o_huUpdateRight = T(0.0);
+      o_hUpdateLeft = o_hUpdateRight = o_huUpdateLeft = o_huUpdateRight = _mm256_setzero_pd();
 
       //! Where to store the two f-waves
-      T fWaves[2][2];
+      __m256d fWaves[2][2];
 
       // Compute the decomposition into f-waves
       computeWaveDecomposition(waveSpeeds, fWaves);
 
       // Compute the net-updates
       // 1st wave family
-      if (waveSpeeds[0] < -zeroTol_) { // Left going
-        o_hUpdateLeft += fWaves[0][0];
-        o_huUpdateLeft += fWaves[0][1];
-      } else if (waveSpeeds[0] > zeroTol_) { // Right going
-        o_hUpdateRight += fWaves[0][0];
-        o_huUpdateRight += fWaves[0][1];
-      } else { // Split waves
-        o_hUpdateLeft += T(0.5) * fWaves[0][0];
-        o_huUpdateLeft += T(0.5) * fWaves[0][1];
-        o_hUpdateRight += T(0.5) * fWaves[0][0];
-        o_huUpdateRight += T(0.5) * fWaves[0][1];
-      }
 
-      // 2nd wave family
-      if (waveSpeeds[1] < -zeroTol_) { // Left going
-        o_hUpdateLeft += fWaves[1][0];
-        o_huUpdateLeft += fWaves[1][1];
-      } else if (waveSpeeds[1] > zeroTol_) { // Right going
-        o_hUpdateRight += fWaves[1][0];
-        o_huUpdateRight += fWaves[1][1];
-      } else { // Split waves
-        o_hUpdateLeft += T(0.5) * fWaves[1][0];
-        o_huUpdateLeft += T(0.5) * fWaves[1][1];
-        o_hUpdateRight += T(0.5) * fWaves[1][0];
-        o_huUpdateRight += T(0.5) * fWaves[1][1];
-      }
+      alignas(32) double waveSpeeds04Arr[4];_mm256_storeu_pd(waveSpeeds04Arr, waveSpeeds[0]);
+      alignas(32) double waveSpeeds14Arr[4];_mm256_storeu_pd(waveSpeeds14Arr, waveSpeeds[1]);
+      alignas(32) double fWaves004Arr[4];_mm256_storeu_pd(fWaves004Arr, fWaves[0][0]);
+      alignas(32) double fWaves014Arr[4];_mm256_storeu_pd(fWaves014Arr, fWaves[0][1]);
+      alignas(32) double fWaves104Arr[4];_mm256_storeu_pd(fWaves104Arr, fWaves[1][0]);
+      alignas(32) double fWaves114Arr[4];_mm256_storeu_pd(fWaves114Arr, fWaves[1][1]);
+      alignas(32) double o_hUpdateLeft4Arr[4];_mm256_storeu_pd(o_hUpdateLeft4Arr, o_hUpdateLeft);
+      alignas(32) double o_huUpdateLeft4Arr[4];_mm256_storeu_pd(o_huUpdateLeft4Arr, o_huUpdateLeft);
+      alignas(32) double o_hUpdateRight4Arr[4];_mm256_storeu_pd(o_hUpdateRight4Arr, o_hUpdateRight);
+      alignas(32) double o_huUpdateRight4Arr[4];_mm256_storeu_pd(o_huUpdateRight4Arr, o_huUpdateRight);
+      for(int i=0;i<4;i++){
+          if (waveSpeeds04Arr[i] < -zeroTol_) { // Left going
+            o_hUpdateLeft4Arr[i] += fWaves004Arr[i];
+            o_huUpdateLeft4Arr[i] += fWaves014Arr[i];
+          } else if (waveSpeeds04Arr[i] > zeroTol_) { // Right going
+            o_hUpdateRight4Arr[i] += fWaves004Arr[i];
+            o_huUpdateRight4Arr[i] += fWaves014Arr[i];
+          } else { // Split waves
+            o_hUpdateLeft4Arr[i] += (0.5) * fWaves004Arr[i];
+            o_huUpdateLeft4Arr[i] += (0.5) * fWaves014Arr[i];
+            o_hUpdateRight4Arr[i] += (0.5) * fWaves004Arr[i];
+            o_huUpdateRight4Arr[i] += (0.5) * fWaves014Arr[i];
+          }
 
+          // 2nd wave family
+          if (waveSpeeds[1] < -zeroTol_) { // Left going
+            o_hUpdateLeft4Arr[i] += fWaves104Arr[i];
+            o_huUpdateLeft4Arr[i] += fWaves114Arr[i];
+          } else if (waveSpeeds[1] > zeroTol_) { // Right going
+            o_hUpdateRight4Arr[i] += fWaves104Arr[i];
+            o_huUpdateRight4Arr[i] += fWaves114Arr[i];
+          } else { // Split waves
+            o_hUpdateLeft4Arr[i] += (0.5) * fWaves104Arr[i];
+            o_huUpdateLeft4Arr[i] += (0.5) * fWaves114Arr[i];
+            o_hUpdateRight4Arr[i] += (0.5) * fWaves104Arr[i];
+            o_huUpdateRight4Arr[i] += (0.5) * fWaves114Arr[i];
+          }
+
+      }
+      o_hUpdateLeft = _mm256_loadu_pd(o_hUpdateLeft4Arr);
+      o_huUpdateLeft = _mm256_loadu_pd(o_huUpdateLeft4Arr);
+      o_hUpdateRight = _mm256_loadu_pd(o_hUpdateRight4Arr);
+      o_huUpdateRight = _mm256_loadu_pd(o_huUpdateRight4Arr);
       // Compute maximum wave speed (-> CFL-condition)
-      o_maxWaveSpeed = std::max(std::fabs(waveSpeeds[0]), std::fabs(waveSpeeds[1]));
+      o_maxWaveSpeed = _mm256_max_pd(_mm256_andnot_pd(_mm256_set1_pd(-0.0), waveSpeeds[0]), _mm256_andnot_pd(_mm256_set1_pd(-0.0), waveSpeeds[1]));
     }
 
   protected:
@@ -255,34 +282,53 @@ namespace Solvers {
      */
     void determineWetDryState() override {
       // Determine the wet/dry state
-      if (hLeft_ < dryTol_ && hRight_ < dryTol_) { // Both cells are dry
-        wetDryState_ = WavePropagationSolver<T>::WetDryState::DryDry;
-      } else if (hLeft_ < dryTol_) { // Left cell dry, right cell wet
-        uRight_ = huRight_ / hRight_;
+      alignas(32) double hLeft4Arr[4];_mm256_storeu_pd(hLeft4Arr, hLeft);
+      alignas(32) double hRight4Arr[4];_mm256_storeu_pd(hRight4Arr, hRight);
+      alignas(32) double uRight4Arr[4];_mm256_storeu_pd(uRight4Arr, uRight);
+      alignas(32) double huRight4Arr[4];_mm256_storeu_pd(huRight4Arr, huRight);
+      alignas(32) double bLeft4Arr[4];_mm256_storeu_pd(bLeft4Arr, bLeft);
+      alignas(32) double bRight4Arr[4];_mm256_storeu_pd(bRight4Arr, bRight);
+      alignas(32) double huLeft4Arr[4];_mm256_storeu_pd(huLeft4Arr, huLeft);
+      alignas(32) double uLeft4Arr[4];_mm256_storeu_pd(uLeft4Arr, uLeft);
+      for(int i=0;i<4;i++){
+        if (hLeft4Arr[i] < dryTol_ && hRight4Arr[i] < dryTol_) { // Both cells are dry
+          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::DryDry;
+        } else if (hLeft4Arr[i] < dryTol_) { // Left cell dry, right cell wet
+          uRight4Arr[i] = huRight4Arr[i] / hRight4Arr[i];
 
-        // Set wall boundary conditions.
-        // This is not correct in the case of inundation problems.
-        hLeft_       = hRight_;
-        bLeft_       = bRight_;
-        huLeft_      = -huRight_;
-        uLeft_       = -uRight_;
-        wetDryState_ = WavePropagationSolver<T>::WetDryState::DryWetWall;
-      } else if (hRight_ < dryTol_) { // Left cell wet, right cell dry
-        uLeft_ = huLeft_ / hLeft_;
+          // Set wall boundary conditions.
+          // This is not correct in the case of inundation problems.
+          hLeft4Arr[i]       = hRight4Arr[i];
+          bLeft4Arr[i]       = bRight4Arr[i];
+          huLeft4Arr[i]      = -huRight4Arr[i];
+          uLeft4Arr[i]       = -uRight4Arr[i];
+          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::DryWetWall;
+        } else if (hRight4Arr[i] < dryTol_) { // Left cell wet, right cell dry
+          uLeft_ = huLeft4Arr[i] / hLeft4Arr[i];
 
-        // Set wall boundary conditions.
-        // This is not correct in the case of inundation problems.
-        hRight_      = hLeft_;
-        bRight_      = bLeft_;
-        huRight_     = -huLeft_;
-        uLeft_       = -uRight_;
-        wetDryState_ = WavePropagationSolver<T>::WetDryState::WetDryWall;
-      } else { // Both cells wet
-        uLeft_  = huLeft_ / hLeft_;
-        uRight_ = huRight_ / hRight_;
+          // Set wall boundary conditions.
+          // This is not correct in the case of inundation problems.
+          hRight4Arr[i]      = hLeft4Arr[i];
+          bRight4Arr[i]      = bLeft4Arr[i] ;
+          huRight4Arr[i]     = -huLeft4Arr[i];
+          uLeft4Arr[i]       = -uRight4Arr[i];
+          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::WetDryWall;
+        } else { // Both cells wet
+          uLeft4Arr[i]  = huLeft4Arr[i] / hLeft4Arr[i];
+          uRight4Arr[i] = huRight4Arr[i] / hRight4Arr[i];
 
-        wetDryState_ = WavePropagationSolver<T>::WetDryState::WetWet;
+          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::WetWet;
+        }
       }
+      hLeft = _mm256_loadu_pd(hLeft4Arr);
+      hRight = _mm256_loadu_pd(hRight4Arr);
+      uRight = _mm256_loadu_pd(uRight4Arr);
+      huRight = _mm256_loadu_pd(huRight4Arr);
+      bLeft = _mm256_loadu_pd(bLeft4Arr);
+      bRight = _mm256_loadu_pd(bRight4Arr);
+      huLeft = _mm256_loadu_pd(huLeft4Arr);
+      uLeft = _mm256_loadu_pd(uLeft4Arr);
+      
     }
 
   public:
@@ -324,39 +370,33 @@ namespace Solvers {
      * @param o_huUpdateRight will be set to: Net-update for the momentum of the cell on the right side of the edge.
      * @param o_maxWaveSpeed will be set to: Maximum (linearized) wave speed -> Should be used in the CFL-condition.
      */
-    void computeNetUpdates(
-      const T& hLeft,
-      const T& hRight,
-      const T& huLeft,
-      const T& huRight,
-      const T& bLeft,
-      const T& bRight,
-      T&       o_hUpdateLeft,
-      T&       o_hUpdateRight,
-      T&       o_huUpdateLeft,
-      T&       o_huUpdateRight,
-      T&       o_maxWaveSpeed
+    void computeNetUpdates( ///////////////////////////////////////////////////////////////////////7/77/////////////////////////77
+      const __m256d& hLeft,
+      const __m256d& hRight,
+      const __m256d& huLeft,
+      const __m256d& huRight,
+      const __m256d& bLeft,
+      const __m256d& bRight,
+      __m256d&       o_hUpdateLeft,
+      __m256d&       o_hUpdateRight,
+      __m256d&       o_huUpdateLeft,
+      __m256d&       o_huUpdateRight,
+      __m256d&       o_maxWaveSpeed
     ) override {
       // Set speeds to zero (will be determined later)
-      uLeft_ = uRight_ = 0;
+      uLeft_ = uRight_ = _mm256_setzero_pd();
 
       // Reset the maximum wave speed
-      o_maxWaveSpeed = 0;
+      o_maxWaveSpeed = _mm256_setzero_pd();
 
       //! Wave speeds of the f-waves
-      T waveSpeeds[2];
+      __m256d waveSpeeds[2];
 
       // Store parameters to member variables
       WavePropagationSolver<T>::storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
 
       // Determine the wet/dry state and compute local variables correspondingly
       determineWetDryState();
-
-      // Zero updates and return in the case of dry cells
-      if (wetDryState_ == WavePropagationSolver<T>::WetDryState::DryDry) {
-        o_hUpdateLeft = o_hUpdateRight = o_huUpdateLeft = o_huUpdateRight = T(0.0);
-        return;
-      }
 
       // Compute the wave speeds
       computeWaveSpeeds(waveSpeeds);
@@ -373,6 +413,58 @@ namespace Solvers {
       } else if (wetDryState_ == WavePropagationSolver<T>::WetDryState::DryWetWall) {
         o_hUpdateLeft  = 0;
         o_huUpdateLeft = 0;
+      );
+
+      // Zero updates and return in the case of dry cells
+      if (wetDryState_ == WavePropagationSolver<T>::WetDryState::DryDry) {
+        o_hUpdateLeft = o_hUpdateRight = o_huUpdateLeft = o_huUpdateRight = T(0.0);
+      }
+
+      // Update the thread-local maximum wave speed
+      maxWaveSpeed = std::max(maxWaveSpeed, maxEdgeSpeed);
+    }
+  }
+
+  if (maxWaveSpeed > 0.00001) {
+    // Compute the time step width
+    maxTimeStep_ = std::min(dx_ / maxWaveSpeed, dy_ / maxWaveSpeed);
+
+    // Reduce maximum time step size by "safety factor"
+    maxTimeStep_ *= RealType(0.4); // CFL-number = 0.5
+  } else {
+    // Might happen in dry cells
+    maxTimeStep_ = std::numeric_limits<RealType>::max();
+  }
+}
+
+void Blocks::WavePropagationBlock::updateUnknowns(RealType dt) {
+  // Update cell averages with the net-updates
+  for (int i = 1; i < nx_ + 1; i++) {
+    for (int j = 1; j < ny_ + 1; j++) {
+      h_[i][j] -= dt / dx_ * (hNetUpdatesRight_[i - 1][j - 1] + hNetUpdatesLeft_[i][j - 1])
+                  + dt / dy_ * (hNetUpdatesAbove_[i - 1][j - 1] + hNetUpdatesBelow_[i - 1][j]);
+      hu_[i][j] -= dt / dx_ * (huNetUpdatesRight_[i - 1][j - 1] + huNetUpdatesLeft_[i][j - 1]);
+      hv_[i][j] -= dt / dy_ * (hvNetUpdatesAbove_[i - 1][j - 1] + hvNetUpdatesBelow_[i - 1][j]);
+
+      if (h_[i][j] < 0) {
+#ifndef NDEBUG
+        // Only print this warning when debug is enabled
+        // Otherwise we cannot vectorize this loop
+        if (h_[i][j] < -0.1) {
+          std::cerr << "Warning, negative height: (i,j)=(" << i << "," << j << ")=" << h_[i][j] << std::endl;
+          std::cerr << "         b: " << b_[i][j] << std::endl;
+        }
+#endif
+
+        // Zero (small) negative depths
+        h_[i][j] = hu_[i][j] = hv_[i][j] = RealType(0.0);
+      } else if (h_[i][j] < 0.1) {             // dryTol
+        hu_[i][j] = hv_[i][j] = RealType(0.0); // No water, no speed!
+      }
+    }
+  }
+}
+
       }
     }
 
