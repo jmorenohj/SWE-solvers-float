@@ -96,7 +96,7 @@ namespace Solvers {
 
       // Compute "Roe speeds"
       
-      __m256d hRoe = _mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_add_pd(hRight, hLeft));
+      __m256d hRoe = _mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_add_pd(hRight_, hLeft_));
 
       __m256d sqrtHL = _mm256_sqrt_pd(hLeft_);
       __m256d sqrtHR = _mm256_sqrt_pd(hRight_);
@@ -177,7 +177,7 @@ namespace Solvers {
       // Calculate modified (bathymetry!) flux difference_mm256_set1_pd(0.5)
       // f(Q_i) - f(Q_{i-1})
       fDif[0] = _mm256_sub_pd(huRight_, huLeft_);
-      fDif[1] = _mm256_sub_pd(_mm256_add_pd(_mm256_mul_pd(huRight_,uRight_), _mm256_mul_pd(_mm256_mul_pd(_mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_pd(gravity)), hRight_), hRight_))
+      fDif[1] = _mm256_sub_pd(_mm256_add_pd(_mm256_mul_pd(huRight_,uRight_), _mm256_mul_pd(_mm256_mul_pd(_mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_pd(gravity_)), hRight_), hRight_))
                 , _mm256_add_pd(_mm256_mul_pd(huLeft_, uLeft_), _mm256_mul_pd(_mm256_mul_pd(_mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_pd(gravity_)), hLeft_), hLeft_)));
 
       // \delta x \Psi[2]
@@ -419,7 +419,7 @@ namespace Solvers {
         } else if (wetDryState_ == WavePropagationSolver<double>::WetDryState::DryWetWall) {
           o_hUpdateLeft4Arr[i]  = 0;
           o_huUpdateLeft4Arr[i] = 0;
-        );
+        }
 
         // Zero updates and return in the case of dry cells
         if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::DryDry) {
@@ -431,7 +431,7 @@ namespace Solvers {
       // Update the thread-local maximum wave speed
       maxWaveSpeed = _mm256_max_pd(maxWaveSpeed, maxEdgeSpeed);
     }
-  }
+  
 
   
 
