@@ -98,10 +98,10 @@ namespace Solvers {
       
       __m256d hRoe = _mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_add_pd(hRight, hLeft));
 
-      __m256d sqrtHL = _mm256_sqrt_pd(hLeft);
-      __m256d sqrtHR = _mm256_sqrt_pd(hRight);
+      __m256d sqrtHL = _mm256_sqrt_pd(hLeft_);
+      __m256d sqrtHR = _mm256_sqrt_pd(hRight_);
 
-      __m256d uRoe = _mm256_add_pd(_mm256_mul_pd(uLeft, sqrtHL), _mm256_mul_pd(uRight, sqrtHR));
+      __m256d uRoe = _mm256_add_pd(_mm256_mul_pd(uLeft_, sqrtHL), _mm256_mul_pd(uRight_, sqrtHR));
 
       uRoe = _mm256_div_pd(uRoe, _mm256_add_pd(sqrtHL, sqrtHR));
 
@@ -164,7 +164,7 @@ namespace Solvers {
       // Compute the inverse matrix R^{-1}
       __m256d Rinv[2][2]{};
 
-      _m256d oneDivLambdaDif = _mm256_div_pd(_mm256_set1_pd(1.0), lambdaDif);
+      __m256d oneDivLambdaDif = _mm256_div_pd(_mm256_set1_pd(1.0), lambdaDif);
       Rinv[0][0]        = _mm256_mul_pd(oneDivLambdaDif, waveSpeeds[1]);
       Rinv[0][1]        = _mm256_mul_pd(_mm256_set1_pd(-1.0),oneDivLambdaDif);
 
