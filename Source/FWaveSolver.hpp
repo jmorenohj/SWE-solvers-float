@@ -433,48 +433,7 @@ namespace Solvers {
     }
   }
 
-  if (maxWaveSpeed > 0.00001) {
-    // Compute the time step width
-    maxTimeStep_ = std::min(dx_ / maxWaveSpeed, dy_ / maxWaveSpeed);
-
-    // Reduce maximum time step size by "safety factor"
-    maxTimeStep_ *= RealType(0.4); // CFL-number = 0.5
-  } else {
-    // Might happen in dry cells
-    maxTimeStep_ = std::numeric_limits<RealType>::max();
-  }
-}
-
-void Blocks::WavePropagationBlock::updateUnknowns(RealType dt) {
-  // Update cell averages with the net-updates
-  for (int i = 1; i < nx_ + 1; i++) {
-    for (int j = 1; j < ny_ + 1; j++) {
-      h_[i][j] -= dt / dx_ * (hNetUpdatesRight_[i - 1][j - 1] + hNetUpdatesLeft_[i][j - 1])
-                  + dt / dy_ * (hNetUpdatesAbove_[i - 1][j - 1] + hNetUpdatesBelow_[i - 1][j]);
-      hu_[i][j] -= dt / dx_ * (huNetUpdatesRight_[i - 1][j - 1] + huNetUpdatesLeft_[i][j - 1]);
-      hv_[i][j] -= dt / dy_ * (hvNetUpdatesAbove_[i - 1][j - 1] + hvNetUpdatesBelow_[i - 1][j]);
-
-      if (h_[i][j] < 0) {
-#ifndef NDEBUG
-        // Only print this warning when debug is enabled
-        // Otherwise we cannot vectorize this loop
-        if (h_[i][j] < -0.1) {
-          std::cerr << "Warning, negative height: (i,j)=(" << i << "," << j << ")=" << h_[i][j] << std::endl;
-          std::cerr << "         b: " << b_[i][j] << std::endl;
-        }
-#endif
-
-        // Zero (small) negative depths
-        h_[i][j] = hu_[i][j] = hv_[i][j] = RealType(0.0);
-      } else if (h_[i][j] < 0.1) {             // dryTol
-        hu_[i][j] = hv_[i][j] = RealType(0.0); // No water, no speed!
-      }
-    }
-  }
-}
-
-      }
-    }
+  
 
     /**
      * Compute net updates for the cell on the left/right side of the edge.
