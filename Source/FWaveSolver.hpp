@@ -304,7 +304,7 @@ namespace Solvers {
           uLeft4Arr[i]       = -uRight4Arr[i];
           wetDryState_[i] = WavePropagationSolver<T>::WetDryState::DryWetWall;
         } else if (hRight4Arr[i] < dryTol_) { // Left cell wet, right cell dry
-          uLeft_ = huLeft4Arr[i] / hLeft4Arr[i];
+          uLeft4Arr[i] = huLeft4Arr[i] / hLeft4Arr[i];
 
           // Set wall boundary conditions.
           // This is not correct in the case of inundation problems.
@@ -416,7 +416,7 @@ namespace Solvers {
         if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::WetDryWall) {
           o_hUpdateRight4Arr[i]  = 0;
           o_huUpdateRight4Arr[i] = 0;
-        } else if (wetDryState_ == WavePropagationSolver<double>::WetDryState::DryWetWall) {
+        } else if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::DryWetWall) {
           o_hUpdateLeft4Arr[i]  = 0;
           o_huUpdateLeft4Arr[i] = 0;
         }
