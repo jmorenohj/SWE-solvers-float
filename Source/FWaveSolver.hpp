@@ -407,21 +407,29 @@ namespace Solvers {
       );
 
       // Zero ghost updates (wall boundary)
-      if (wetDryState_ == WavePropagationSolver<T>::WetDryState::WetDryWall) {
-        o_hUpdateRight  = 0;
-        o_huUpdateRight = 0;
-      } else if (wetDryState_ == WavePropagationSolver<T>::WetDryState::DryWetWall) {
-        o_hUpdateLeft  = 0;
-        o_huUpdateLeft = 0;
-      );
+      alignas(32) double o_hUpdateLeft4Arr[4];_mm256_storeu_pd(o_hUpdateLeft4Arr, o_hUpdateLeft);
+      alignas(32) double o_huUpdateLeft4Arr[4];_mm256_storeu_pd(o_huUpdateLeft4Arr, o_huUpdateLeft);
+      alignas(32) double o_hUpdateRight4Arr[4];_mm256_storeu_pd(o_hUpdateRight4Arr, o_hUpdateRight);
+      alignas(32) double o_huUpdateRight4Arr[4];_mm256_storeu_pd(o_huUpdateRight4Arr, o_huUpdateRight);
+      
+      for(int i=0;i<4;i++){
+        if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::WetDryWall) {
+          o_hUpdateRight4Arr[i]  = 0;
+          o_huUpdateRight4Arr[i] = 0;
+        } else if (wetDryState_ == WavePropagationSolver<double>::WetDryState::DryWetWall) {
+          o_hUpdateLeft4Arr[i]  = 0;
+          o_huUpdateLeft4Arr[i] = 0;
+        );
 
-      // Zero updates and return in the case of dry cells
-      if (wetDryState_ == WavePropagationSolver<T>::WetDryState::DryDry) {
-        o_hUpdateLeft = o_hUpdateRight = o_huUpdateLeft = o_huUpdateRight = T(0.0);
+        // Zero updates and return in the case of dry cells
+        if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::DryDry) {
+          o_hUpdateLeft4Arr[i] = o_hUpdateRight4Arr[i] = o_huUpdateLeft4Arr[i] = o_huUpdateRight4Arr[i] = 0.0;
+        }
       }
+      
 
       // Update the thread-local maximum wave speed
-      maxWaveSpeed = std::max(maxWaveSpeed, maxEdgeSpeed);
+      maxWaveSpeed = _mm256_max_pd(maxWaveSpeed, maxEdgeSpeed);
     }
   }
 
