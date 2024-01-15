@@ -428,8 +428,7 @@ namespace Solvers {
       }
       
 
-      // Update the thread-local maximum wave speed
-      maxWaveSpeed = _mm256_max_pd(maxWaveSpeed, maxEdgeSpeed);
+      
     }
   
 
