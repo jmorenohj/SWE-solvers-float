@@ -292,7 +292,7 @@ namespace Solvers {
       alignas(32) double uLeft4Arr[4];_mm256_storeu_pd(uLeft4Arr, uLeft_);
       for(int i=0;i<4;i++){
         if (hLeft4Arr[i] < dryTol_ && hRight4Arr[i] < dryTol_) { // Both cells are dry
-          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::DryDry;
+          wetDryState_[i] = WavePropagationSolver<double>::WetDryState::DryDry;
         } else if (hLeft4Arr[i] < dryTol_) { // Left cell dry, right cell wet
           uRight4Arr[i] = huRight4Arr[i] / hRight4Arr[i];
 
@@ -393,7 +393,7 @@ namespace Solvers {
       __m256d waveSpeeds[2];
 
       // Store parameters to member variables
-      WavePropagationSolver<T>::storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
+      WavePropagationSolver<double>::storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
 
       // Determine the wet/dry state and compute local variables correspondingly
       determineWetDryState();
