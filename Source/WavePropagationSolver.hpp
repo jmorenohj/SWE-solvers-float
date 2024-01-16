@@ -77,7 +77,7 @@ namespace Solvers {
      * @param dryTolerance numerical definition of "dry".
      * @param zeroTolerance numerical definition of zero.
      */
-    WavePropagationSolver(T dryTolerance, T gravity, T zeroTolerance):
+    WavePropagationSolver(double dryTolerance, double gravity, double zeroTolerance):
       dryTol_(dryTolerance),
       gravity_(gravity),
       zeroTol_(zeroTolerance) {}
