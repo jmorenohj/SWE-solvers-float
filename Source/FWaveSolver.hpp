@@ -64,23 +64,23 @@ namespace Solvers {
    * T should be double or float.
    */
   template <class T>
-  class FWaveSolver: public WavePropagationSolver<T> {
+  class FWaveSolver: public WavePropagationSolver<double> {
   private:
     // Use nondependent names (template base class)
-    using WavePropagationSolver<T>::dryTol_;
-    using WavePropagationSolver<T>::gravity_;
-    using WavePropagationSolver<T>::zeroTol_;
+    using WavePropagationSolver<double>::dryTol_;
+    using WavePropagationSolver<double>::gravity_;
+    using WavePropagationSolver<double>::zeroTol_;
 
-    using WavePropagationSolver<T>::hLeft_;
-    using WavePropagationSolver<T>::hRight_;
-    using WavePropagationSolver<T>::huLeft_;
-    using WavePropagationSolver<T>::huRight_;
-    using WavePropagationSolver<T>::bLeft_;
-    using WavePropagationSolver<T>::bRight_;
-    using WavePropagationSolver<T>::uLeft_;
-    using WavePropagationSolver<T>::uRight_;
+    using WavePropagationSolver<double>::hLeft_;
+    using WavePropagationSolver<double>::hRight_;
+    using WavePropagationSolver<double>::huLeft_;
+    using WavePropagationSolver<double>::huRight_;
+    using WavePropagationSolver<double>::bLeft_;
+    using WavePropagationSolver<double>::bRight_;
+    using WavePropagationSolver<double>::uLeft_;
+    using WavePropagationSolver<double>::uRight_;
 
-    using WavePropagationSolver<T>::wetDryState_;
+    using WavePropagationSolver<double>::wetDryState_;
 
     /**
      * Compute the edge local eigenvalues.

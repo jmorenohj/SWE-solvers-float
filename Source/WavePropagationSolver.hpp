@@ -154,17 +154,17 @@ namespace Solvers {
      * @param o_maxWaveSpeed will be set to: Maximum (linearized) wave speed -> Should be used in the CFL-condition.
      */
     virtual void computeNetUpdates(
-      const T& hLeft,
-      const T& hRight,
-      const T& huLeft,
-      const T& huRight,
-      const T& bLeft,
-      const T& bRight,
-      T&       o_hUpdateLeft,
-      T&       o_hUpdateRight,
-      T&       o_huUpdateLeft,
-      T&       o_huUpdateRight,
-      T&       o_maxWaveSpeed
+      const __m256d& hLeft,
+      const __m256d& hRight,
+      const __m256d& huLeft,
+      const __m256d& huRight,
+      const __m256d& bLeft,
+      const __m256d& bRight,
+      __m256d&       o_hUpdateLeft,
+      __m256d&       o_hUpdateRight,
+      __m256d&       o_huUpdateLeft,
+      __m256d&       o_huUpdateRight,
+      __m256d&       o_maxWaveSpeed
 #ifdef ENABLE_AUGMENTED_RIEMANN_EIGEN_COEFFICIENTS
       ,
       T o_eigenCoefficients[3]
