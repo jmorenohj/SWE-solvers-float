@@ -254,10 +254,10 @@ namespace Solvers {
           }
 
           // 2nd wave family
-          if (waveSpeeds[1] < -zeroTol_) { // Left going
+          if (waveSpeeds14Arr[i] < -zeroTol_) { // Left going
             o_hUpdateLeft4Arr[i] += fWaves104Arr[i];
             o_huUpdateLeft4Arr[i] += fWaves114Arr[i];
-          } else if (waveSpeeds[1] > zeroTol_) { // Right going
+          } else if (waveSpeeds14Arr[i] > zeroTol_) { // Right going
             o_hUpdateRight4Arr[i] += fWaves104Arr[i];
             o_huUpdateRight4Arr[i] += fWaves114Arr[i];
           } else { // Split waves
