@@ -13,9 +13,9 @@ namespace Solvers {
   class WavePropagationSolver {
     // protected:
   public:
-    T       dryTol_;  //! Numerical definition of "dry".
-    const T gravity_; //! Gravity constant.
-    const T zeroTol_; //! Numerical definition of zero.
+    double       dryTol_;  //! Numerical definition of "dry".
+    const double gravity_; //! Gravity constant.
+    const double zeroTol_; //! Numerical definition of zero.
 
 #if 0
     //! Parameters for computeNetUpdates.
