@@ -340,9 +340,9 @@ namespace Solvers {
      * @param zeroTolerance numerical definition of zero.
      */
     FWaveSolver(
-      T dryTolerance  = static_cast<T>(0.01),
-      T gravity       = static_cast<T>(9.81),
-      T zeroTolerance = static_cast<T>(0.000000001)
+      double dryTolerance  = static_cast<double>(0.01),
+      double gravity       = static_cast<double>(9.81),
+      double zeroTolerance = static_cast<double>(0.000000001)
     ):
       WavePropagationSolver<T>(dryTolerance, gravity, zeroTolerance) {}
 
