@@ -344,7 +344,7 @@ namespace Solvers {
       double gravity       = static_cast<double>(9.81),
       double zeroTolerance = static_cast<double>(0.000000001)
     ):
-      WavePropagationSolver<T>(dryTolerance, gravity, zeroTolerance) {}
+      WavePropagationSolver<double>(dryTolerance, gravity, zeroTolerance) {}
 
     ~FWaveSolver() override = default;
 
