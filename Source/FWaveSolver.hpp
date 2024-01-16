@@ -302,7 +302,7 @@ namespace Solvers {
           bLeft4Arr[i]       = bRight4Arr[i];
           huLeft4Arr[i]      = -huRight4Arr[i];
           uLeft4Arr[i]       = -uRight4Arr[i];
-          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::DryWetWall;
+          wetDryState_[i] = WavePropagationSolver<double>::WetDryState::DryWetWall;
         } else if (hRight4Arr[i] < dryTol_) { // Left cell wet, right cell dry
           uLeft4Arr[i] = huLeft4Arr[i] / hLeft4Arr[i];
 
@@ -312,12 +312,12 @@ namespace Solvers {
           bRight4Arr[i]      = bLeft4Arr[i] ;
           huRight4Arr[i]     = -huLeft4Arr[i];
           uLeft4Arr[i]       = -uRight4Arr[i];
-          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::WetDryWall;
+          wetDryState_[i] = WavePropagationSolver<double>::WetDryState::WetDryWall;
         } else { // Both cells wet
           uLeft4Arr[i]  = huLeft4Arr[i] / hLeft4Arr[i];
           uRight4Arr[i] = huRight4Arr[i] / hRight4Arr[i];
 
-          wetDryState_[i] = WavePropagationSolver<T>::WetDryState::WetWet;
+          wetDryState_[i] = WavePropagationSolver<double>::WetDryState::WetWet;
         }
       }
       hLeft_ = _mm256_loadu_pd(hLeft4Arr);

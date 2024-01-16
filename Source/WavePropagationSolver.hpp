@@ -93,7 +93,7 @@ namespace Solvers {
      * @param bRight bathymetry on the right side of the edge.
      */
     void storeParameters(          ////////////////////////////////////////////////////////////////////////////////////
-      const T& hLeft, const T& hRight, const T& huLeft, const T& huRight, const T& bLeft, const T& bRight
+      const __m256d& hLeft, const __m256d& hRight, const __m256d& huLeft, const __m256d& huRight, const __m256d& bLeft, const __m256d& bRight
     ) {
       hLeft_  = hLeft;
       hRight_ = hRight;
