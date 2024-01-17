@@ -427,10 +427,10 @@ namespace Solvers {
           o_hUpdateLeft4Arr[i] = o_hUpdateRight4Arr[i] = o_huUpdateLeft4Arr[i] = o_huUpdateRight4Arr[i] = 0.0;
         }
       }
-      o_hUpdateLeft4Arr = _mm256_loadu_pd(o_hUpdateLeft4Arr);
-      o_huUpdateLeft4Arr = _mm256_loadu_pd(o_huUpdateLeft4Arr);
-      o_hUpdateRight4Arr = _mm256_loadu_pd(o_hUpdateRight4Arr);
-      o_huUpdateRight4Arr = _mm256_loadu_pd(o_huUpdateRight4Arr);
+      o_hUpdateLeft = _mm256_loadu_pd(o_hUpdateLeft4Arr);
+      o_huUpdateLeft = _mm256_loadu_pd(o_huUpdateLeft4Arr);
+      o_hUpdateRight = _mm256_loadu_pd(o_hUpdateRight4Arr);
+      o_huUpdateRight = _mm256_loadu_pd(o_huUpdateRight4Arr);
 
       
     }
