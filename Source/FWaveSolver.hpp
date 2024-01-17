@@ -397,8 +397,8 @@ namespace Solvers {
       WavePropagationSolver<double>::storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
 
       // Determine the wet/dry state and compute local variables correspondingly
-      /*determineWetDryState();
-
+      determineWetDryState();
+      /**/
       // Compute the wave speeds
       computeWaveSpeeds(waveSpeeds);
 
