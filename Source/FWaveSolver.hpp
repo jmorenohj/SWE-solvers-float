@@ -384,7 +384,7 @@ namespace Solvers {
       __m256d&       o_maxWaveSpeed
     ) override {
       // Set speeds to zero (will be determined later)
-      std::cout<<"jijijijiji gonorrea"<<std::endl;
+     
       uLeft_ = uRight_ = _mm256_setzero_pd();
 
       // Reset the maximum wave speed
