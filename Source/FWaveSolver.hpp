@@ -406,7 +406,7 @@ namespace Solvers {
       computeNetUpdatesWithWaveSpeeds(
         waveSpeeds, o_hUpdateLeft, o_hUpdateRight, o_huUpdateLeft, o_huUpdateRight, o_maxWaveSpeed
       );
-      /*
+      
       // Zero ghost updates (wall boundary)
       alignas(32) double o_hUpdateLeft4Arr[4];_mm256_storeu_pd(o_hUpdateLeft4Arr, o_hUpdateLeft);
       alignas(32) double o_huUpdateLeft4Arr[4];_mm256_storeu_pd(o_huUpdateLeft4Arr, o_huUpdateLeft);
@@ -426,7 +426,7 @@ namespace Solvers {
         if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::DryDry) {
           o_hUpdateLeft4Arr[i] = o_hUpdateRight4Arr[i] = o_huUpdateLeft4Arr[i] = o_huUpdateRight4Arr[i] = 0.0;
         }
-      }*/
+      }
       
 
       
