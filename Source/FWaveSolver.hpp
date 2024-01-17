@@ -403,10 +403,10 @@ namespace Solvers {
       computeWaveSpeeds(waveSpeeds);
 
       // Use the wave speeds to compute the net-updates
-      /*computeNetUpdatesWithWaveSpeeds(
+      computeNetUpdatesWithWaveSpeeds(
         waveSpeeds, o_hUpdateLeft, o_hUpdateRight, o_huUpdateLeft, o_huUpdateRight, o_maxWaveSpeed
       );
-
+      /*
       // Zero ghost updates (wall boundary)
       alignas(32) double o_hUpdateLeft4Arr[4];_mm256_storeu_pd(o_hUpdateLeft4Arr, o_hUpdateLeft);
       alignas(32) double o_huUpdateLeft4Arr[4];_mm256_storeu_pd(o_huUpdateLeft4Arr, o_huUpdateLeft);
