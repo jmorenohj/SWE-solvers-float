@@ -398,7 +398,7 @@ namespace Solvers {
 
       // Determine the wet/dry state and compute local variables correspondingly
       determineWetDryState();
-      /**/
+      /*
       // Compute the wave speeds
       computeWaveSpeeds(waveSpeeds);
 
