@@ -398,12 +398,12 @@ namespace Solvers {
 
       // Determine the wet/dry state and compute local variables correspondingly
       determineWetDryState();
-      /*
+      
       // Compute the wave speeds
       computeWaveSpeeds(waveSpeeds);
 
       // Use the wave speeds to compute the net-updates
-      computeNetUpdatesWithWaveSpeeds(
+      /*computeNetUpdatesWithWaveSpeeds(
         waveSpeeds, o_hUpdateLeft, o_hUpdateRight, o_huUpdateLeft, o_huUpdateRight, o_maxWaveSpeed
       );
 
