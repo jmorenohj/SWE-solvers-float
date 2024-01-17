@@ -390,7 +390,7 @@ namespace Solvers {
       o_maxWaveSpeed = _mm256_setzero_pd();
 
       //! Wave speeds of the f-waves
-      __m256d waveSpeeds[2];
+      /*__m256d waveSpeeds[2];
 
       // Store parameters to member variables
       WavePropagationSolver<double>::storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
@@ -425,7 +425,7 @@ namespace Solvers {
         if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::DryDry) {
           o_hUpdateLeft4Arr[i] = o_hUpdateRight4Arr[i] = o_huUpdateLeft4Arr[i] = o_huUpdateRight4Arr[i] = 0.0;
         }
-      }
+      }*/
       
 
       
