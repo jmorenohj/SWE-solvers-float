@@ -87,7 +87,7 @@ namespace Solvers {
      *
      * @param o_waveSpeeds will be set to: speeds of the linearized waves (eigenvalues).
      */
-    void computeWaveSpeeds(__m256d o_waveSpeeds[2]) const {
+    void computeWaveSpeeds(__m256d &o_waveSpeeds[2]) const {
       // Compute eigenvalues of the Jacobian matrices in states Q_{i-1} and Q_{i}
       __m256d characteristicSpeeds[2]{};
 
@@ -291,7 +291,6 @@ namespace Solvers {
       alignas(32) double huLeft4Arr[4];_mm256_storeu_pd(huLeft4Arr, huLeft_);
       alignas(32) double uLeft4Arr[4];_mm256_storeu_pd(uLeft4Arr, uLeft_);
       for(int i=0;i<4;i++){
-        std::cout<<i<<' '<<huLeft4Arr[i]<<' '<<huRight4Arr[i]<<std::endl;
         if (hLeft4Arr[i] < dryTol_ && hRight4Arr[i] < dryTol_) { // Both cells are dry
           wetDryState_[i] = WavePropagationSolver<double>::WetDryState::DryDry;
         } else if (hLeft4Arr[i] < dryTol_) { // Left cell dry, right cell wet
