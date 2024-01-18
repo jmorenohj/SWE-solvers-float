@@ -87,7 +87,7 @@ namespace Solvers {
      *
      * @param o_waveSpeeds will be set to: speeds of the linearized waves (eigenvalues).
      */
-    void computeWaveSpeeds(__m256d *o_waveSpeeds[2]) const {
+    void computeWaveSpeeds(__m256d o_waveSpeeds[2]) const {
       // Compute eigenvalues of the Jacobian matrices in states Q_{i-1} and Q_{i}
       __m256d characteristicSpeeds[2]{};
 
@@ -400,8 +400,12 @@ namespace Solvers {
       determineWetDryState();
       
       // Compute the wave speeds
+      alignas(32) double prev[4];_mm256_storeu_pd(prev, waveSpeeds[0]);
+      std::cout<<"Prev "<<prev[0]<<' '<<prev[1]<<' '<<prev[2]<<' '<<prev[3]<<std::endl;
       computeWaveSpeeds(waveSpeeds);
-
+      alignas(32) double news[4];_mm256_storeu_pd(new, waveSpeeds[0]);
+      std::cout<<"New "<<news[0]<<' '<<news[1]<<' '<<news[2]<<' '<<news[3]<<std::endl;
+      
       // Use the wave speeds to compute the net-updates
       computeNetUpdatesWithWaveSpeeds(
         waveSpeeds, o_hUpdateLeft, o_hUpdateRight, o_huUpdateLeft, o_huUpdateRight, o_maxWaveSpeed
