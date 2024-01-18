@@ -291,6 +291,7 @@ namespace Solvers {
       alignas(32) double huLeft4Arr[4];_mm256_storeu_pd(huLeft4Arr, huLeft_);
       alignas(32) double uLeft4Arr[4];_mm256_storeu_pd(uLeft4Arr, uLeft_);
       for(int i=0;i<4;i++){
+        std::cout<<i<<' '<<hLeft4Arr[i]<<' '<<hRight4Arr[i]<<std::endl;
         if (hLeft4Arr[i] < dryTol_ && hRight4Arr[i] < dryTol_) { // Both cells are dry
           wetDryState_[i] = WavePropagationSolver<double>::WetDryState::DryDry;
         } else if (hLeft4Arr[i] < dryTol_) { // Left cell dry, right cell wet
