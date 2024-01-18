@@ -116,7 +116,7 @@ namespace Solvers {
       einfeldtSpeeds[1] = _mm256_max_pd(characteristicSpeeds[1], roeSpeeds[1]);
 
       // Set wave speeds
-      o_waveSpeeds[0] = einfeldtSpeeds[0];
+      o_waveSpeeds[0] =_mm256_set1_pd(1.0); //einfeldtSpeeds[0];
       o_waveSpeeds[1] = einfeldtSpeeds[1];
     }
 
