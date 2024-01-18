@@ -400,12 +400,7 @@ namespace Solvers {
       determineWetDryState();
       
       // Compute the wave speeds
-      alignas(32) double prev[4];_mm256_storeu_pd(prev, waveSpeeds[0]);
-      std::cout<<"Prev "<<prev[0]<<' '<<prev[1]<<' '<<prev[2]<<' '<<prev[3]<<std::endl;
       computeWaveSpeeds(waveSpeeds);
-      alignas(32) double news[4];_mm256_storeu_pd(news, waveSpeeds[0]);
-      std::cout<<"New "<<news[0]<<' '<<news[1]<<' '<<news[2]<<' '<<news[3]<<std::endl;
-      
       // Use the wave speeds to compute the net-updates
       computeNetUpdatesWithWaveSpeeds(
         waveSpeeds, o_hUpdateLeft, o_hUpdateRight, o_huUpdateLeft, o_huUpdateRight, o_maxWaveSpeed
