@@ -391,7 +391,7 @@ namespace Solvers {
       o_maxWaveSpeed = _mm256_setzero_pd();
 
       //! Wave speeds of the f-waves
-      __m256d waveSpeeds[2] = _mm256_setzero_pd();
+      __m256d waveSpeeds[2] = {_mm256_setzero_pd(),_mm256_setzero_pd()};
 
       // Store parameters to member variables
       WavePropagationSolver<double>::storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
