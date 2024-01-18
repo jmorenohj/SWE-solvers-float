@@ -87,7 +87,7 @@ namespace Solvers {
      *
      * @param o_waveSpeeds will be set to: speeds of the linearized waves (eigenvalues).
      */
-    void computeWaveSpeeds(__m256d &o_waveSpeeds[2]) const {
+    void computeWaveSpeeds(__m256d *o_waveSpeeds[2]) const {
       // Compute eigenvalues of the Jacobian matrices in states Q_{i-1} and Q_{i}
       __m256d characteristicSpeeds[2]{};
 
