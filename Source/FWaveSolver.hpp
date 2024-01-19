@@ -425,7 +425,7 @@ namespace Solvers {
         if (wetDryState_[i] == WavePropagationSolver<double>::WetDryState::DryDry) {
           o_hUpdateLeft4Arr[i] = o_hUpdateRight4Arr[i] = o_huUpdateLeft4Arr[i] = o_huUpdateRight4Arr[i] = 0.0;
         }
-        std::cout<<wetDryState_[i]<<' '<<o_hUpdateLeft4Arr[i]<<' '<<o_hUpdateRight4Arr[i]<<' '<<o_huUpdateLeft4Arr[i]<<' '<<o_huUpdateRight4Arr[i]<<std::endl;
+        //std::cout<<wetDryState_[i]<<' '<<o_hUpdateLeft4Arr[i]<<' '<<o_hUpdateRight4Arr[i]<<' '<<o_huUpdateLeft4Arr[i]<<' '<<o_huUpdateRight4Arr[i]<<std::endl;
       }
       o_hUpdateLeft = _mm256_loadu_pd(o_hUpdateLeft4Arr);
       o_huUpdateLeft = _mm256_loadu_pd(o_huUpdateLeft4Arr);
