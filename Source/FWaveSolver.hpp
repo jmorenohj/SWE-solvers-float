@@ -70,7 +70,6 @@ namespace Solvers {
     using WavePropagationSolver<float>::dryTol_;
     using WavePropagationSolver<float>::gravity_;
     using WavePropagationSolver<float>::zeroTol_;
-s
     using WavePropagationSolver<float>::hLeft_;
     using WavePropagationSolver<float>::hRight_;
     using WavePropagationSolver<float>::huLeft_;
