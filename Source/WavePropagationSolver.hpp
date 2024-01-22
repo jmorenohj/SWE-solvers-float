@@ -13,9 +13,9 @@ namespace Solvers {
   class WavePropagationSolver {
     // protected:
   public:
-    double       dryTol_;  //! Numerical definition of "dry".
-    const double gravity_; //! Gravity constant.
-    const double zeroTol_; //! Numerical definition of zero.
+    float       dryTol_;  //! Numerical definition of "dry".
+    const float gravity_; //! Gravity constant.
+    const float zeroTol_; //! Numerical definition of zero.
 
 #if 0
     //! Parameters for computeNetUpdates.
@@ -77,7 +77,7 @@ namespace Solvers {
      * @param dryTolerance numerical definition of "dry".
      * @param zeroTolerance numerical definition of zero.
      */
-    WavePropagationSolver(double dryTolerance, double gravity, double zeroTolerance):
+    WavePropagationSolver(float dryTolerance, float gravity, float zeroTolerance):
       dryTol_(dryTolerance),
       gravity_(gravity),
       zeroTol_(zeroTolerance) {}
@@ -118,14 +118,14 @@ namespace Solvers {
      * @param uRight velocity on the right side of the edge.
      */
     void storeParameters(
-      const __m256d& hLeft,
-      const __m256d& hRight,
-      const __m256d& huLeft,
-      const __m256d& huRight,
-      const __m256d& bLeft,
-      const __m256d& bRight,
-      const __m256d& uLeft,
-      const __m256d& uRight
+      const __m256& hLeft,
+      const __m256& hRight,
+      const __m256& huLeft,
+      const __m256& huRight,
+      const __m256& bLeft,
+      const __m256& bRight,
+      const __m256& uLeft,
+      const __m256& uRight
     ) {
       storeParameters(hLeft, hRight, huLeft, huRight, bLeft, bRight);
 
@@ -154,17 +154,17 @@ namespace Solvers {
      * @param o_maxWaveSpeed will be set to: Maximum (linearized) wave speed -> Should be used in the CFL-condition.
      */
     virtual void computeNetUpdates(
-      const __m256d& hLeft,
-      const __m256d& hRight,
-      const __m256d& huLeft,
-      const __m256d& huRight,
-      const __m256d& bLeft,
-      const __m256d& bRight,
-      __m256d&       o_hUpdateLeft,
-      __m256d&       o_hUpdateRight,
-      __m256d&       o_huUpdateLeft,
-      __m256d&       o_huUpdateRight,
-      __m256d&       o_maxWaveSpeed
+      const __m256& hLeft,
+      const __m256& hRight,
+      const __m256& huLeft,
+      const __m256& huRight,
+      const __m256& bLeft,
+      const __m256& bRight,
+      __m256&       o_hUpdateLeft,
+      __m256&       o_hUpdateRight,
+      __m256&       o_huUpdateLeft,
+      __m256&       o_huUpdateRight,
+      __m256&       o_maxWaveSpeed
 #ifdef ENABLE_AUGMENTED_RIEMANN_EIGEN_COEFFICIENTS
       ,
       T o_eigenCoefficients[3]
