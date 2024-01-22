@@ -37,14 +37,14 @@ namespace Solvers {
 #define uRight_ (u_[1])
 #else
     //! Edge-local variables.
-    __m256d hLeft_;   //! Height on the left side of the edge (could change during execution).
-    __m256d hRight_;  //! Height on the right side of the edge (could change during execution).
-    __m256d huLeft_;  //! Momentum on the left side of the edge (could change during execution).
-    __m256d huRight_; //! Momentum on the right side of the edge (could change during execution).
-    __m256d bLeft_;   //! Bathymetry on the left side of the edge (could change during execution).
-    __m256d bRight_;  //! Bathymetry on the right side of the edge (could change during execution).
-    __m256d uLeft_;   //! Velocity on the left side of the edge (computed by determineWetDryState).
-    __m256d uRight_;  //! Velocity on the right side of the edge (computed by determineWetDryState).
+    __m256 hLeft_;   //! Height on the left side of the edge (could change during execution).
+    __m256 hRight_;  //! Height on the right side of the edge (could change during execution).
+    __m256 huLeft_;  //! Momentum on the left side of the edge (could change during execution).
+    __m256 huRight_; //! Momentum on the right side of the edge (could change during execution).
+    __m256 bLeft_;   //! Bathymetry on the left side of the edge (could change during execution).
+    __m256 bRight_;  //! Bathymetry on the right side of the edge (could change during execution).
+    __m256 uLeft_;   //! Velocity on the left side of the edge (computed by determineWetDryState).
+    __m256 uRight_;  //! Velocity on the right side of the edge (computed by determineWetDryState).
 #endif
 
     /**
